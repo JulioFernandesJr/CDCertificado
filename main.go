@@ -29,6 +29,8 @@ var modelo = template.Must(template.ParseGlob("modelo/*"))
 
 func main() {
 	http.HandleFunc("/", Inicio)
+	http.HandleFunc("/buscar", Buscar)
+	http.HandleFunc("/relatorio", Relatorio)
 	http.HandleFunc("/criar", Criar)
 	http.HandleFunc("/inserir", Inserir)
 	http.HandleFunc("/apagar", Apagar)
@@ -61,7 +63,7 @@ func Apagar(w http.ResponseWriter, r *http.Request) {
 
 func Inicio(w http.ResponseWriter, r *http.Request) {
 	connEstabelecida := conexionBD()
-	registros, err := connEstabelecida.Query("SELECT * FROM certificado")
+	registros, err := connEstabelecida.Query("SELECT * FROM certificado ORDER BY data_vencimento")
 
 	if err != nil {
 		panic(err.Error())
@@ -185,4 +187,37 @@ func Atualizar(w http.ResponseWriter, r *http.Request) {
 		atualizarRegistros.Exec(cliente, telefone, id)
 		http.Redirect(w, r, "/", 301)
 	}
+}
+
+func Buscar(w http.ResponseWriter, r *http.Request) {
+	modelo.ExecuteTemplate(w, "buscar", nil)
+}
+
+func Relatorio(w http.ResponseWriter, r *http.Request) {
+	idRegistro := r.URL.Query().Get("DateBusca")
+	fmt.Println(idRegistro)
+
+	connEstabelecida := conexionBD()
+	registro, err := connEstabelecida.Query("SELECT * FROM certificado WHERE data_vencimento=?", idRegistro)
+	if err != nil {
+		panic(err.Error())
+	}
+	certificado := Certificado{}
+	for registro.Next() {
+		var id int
+		var cliente, url, telefone, dataemissao, datavencimento string
+		err = registro.Scan(&id, &cliente, &url, &telefone, &dataemissao, &datavencimento)
+
+		if err != nil {
+			panic(err.Error())
+		}
+		certificado.Id = id
+		certificado.Cliente = cliente
+		certificado.Url = url
+		certificado.Telefone = telefone
+		certificado.DataEmissao = dataemissao
+		certificado.DataVencimento = datavencimento
+	}
+
+	modelo.ExecuteTemplate(w, "relatorio", certificado)
 }
