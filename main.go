@@ -63,7 +63,7 @@ func Apagar(w http.ResponseWriter, r *http.Request) {
 
 func Inicio(w http.ResponseWriter, r *http.Request) {
 	connEstabelecida := conexionBD()
-	registros, err := connEstabelecida.Query("SELECT * FROM certificado ORDER BY data_vencimento")
+	registros, err := connEstabelecida.Query("SELECT * FROM certificado")
 
 	if err != nil {
 		panic(err.Error())
@@ -194,30 +194,37 @@ func Buscar(w http.ResponseWriter, r *http.Request) {
 }
 
 func Relatorio(w http.ResponseWriter, r *http.Request) {
-	idRegistro := r.URL.Query().Get("DateBusca")
-	fmt.Println(idRegistro)
+	if r.Method == "POST" {
+		idBusca := r.FormValue("id")
 
-	connEstabelecida := conexionBD()
-	registro, err := connEstabelecida.Query("SELECT * FROM certificado WHERE data_vencimento=?", idRegistro)
-	if err != nil {
-		panic(err.Error())
-	}
-	certificado := Certificado{}
-	for registro.Next() {
-		var id int
-		var cliente, url, telefone, dataemissao, datavencimento string
-		err = registro.Scan(&id, &cliente, &url, &telefone, &dataemissao, &datavencimento)
+		connEstabelecida := conexionBD()
+		buscaRegistros, err := connEstabelecida.Query("SELECT * FROM certificado WHERE data_vencimento=?", idBusca)
 
 		if err != nil {
 			panic(err.Error())
 		}
-		certificado.Id = id
-		certificado.Cliente = cliente
-		certificado.Url = url
-		certificado.Telefone = telefone
-		certificado.DataEmissao = dataemissao
-		certificado.DataVencimento = datavencimento
+
+		certificado := Certificado{}
+		arrayBusca := []Certificado{}
+		for buscaRegistros.Next() {
+			var id int
+			var cliente, url, telefone, dataemissao, datavencimento string
+			err = buscaRegistros.Scan(&id, &cliente, &url, &telefone, &dataemissao, &datavencimento)
+
+			if err != nil {
+				panic(err.Error())
+			}
+			certificado.Id = id
+			certificado.Cliente = cliente
+			certificado.Url = url
+			certificado.Telefone = telefone
+			certificado.DataEmissao = dataemissao
+			certificado.DataVencimento = datavencimento
+
+			arrayBusca = append(arrayBusca, certificado)
+		}
+
+		modelo.ExecuteTemplate(w, "relatorio", arrayBusca)
 	}
 
-	modelo.ExecuteTemplate(w, "relatorio", certificado)
 }
