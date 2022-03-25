@@ -9,19 +9,48 @@
     <title>Criar</title>
   </head>
   <body>
-  <div class="container-md">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/inicio">Certificados Digitais</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/inicio">Inicio | </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="/buscar">Buscar por Data | </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" aria-current="page" href="/buscarCliente">Buscar por Cliente</a>
+            </li>
+          </ul>
+          <ul class="nav justify-content-end">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/criar">+ Adicionar</a>
+            </li>
+          </ul>  
+        </div>
+      </div>
+    </nav>
+    <br>
+  <div class="container-lg">
     <div class="card">
   <div class="card-header">
-    Cadastro
+    Buscar por data de vencimento
   </div>
   <div class="card-body">
   <form method="POST" action="/relatorio">
 <div class="row g-3">
-  <div class="col-sm-7">
-    <input type="text" class="form-control" name="id" id="id" placeholder="Nome" aria-label="City">
+  <div class="col-sm">
+    <label for="exampleFormControlInput1" class="form-label">Digite a data de vencimento</label>
+    <input type="text" class="form-control" name="id" id="id" placeholder="DD/MM/AAAA" aria-label="City">
   </div>
   </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
+  <br>
+    <button type="submit" class="btn btn-dark">Buscar</button>
   </div>
   </form>
 </div>

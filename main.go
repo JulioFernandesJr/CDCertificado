@@ -46,6 +46,7 @@ type Certificado struct {
 	Id             int
 	Cliente        string
 	Url            string
+	CertPass       string
 	Telefone       string
 	DataEmissao    string
 	DataVencimento string
@@ -76,8 +77,8 @@ func Inicio(w http.ResponseWriter, r *http.Request) {
 
 	for registros.Next() {
 		var id int
-		var cliente, url, telefone, dataemissao, datavencimento string
-		err = registros.Scan(&id, &cliente, &url, &telefone, &dataemissao, &datavencimento)
+		var cliente, url, certPass, telefone, dataemissao, datavencimento string
+		err = registros.Scan(&id, &cliente, &url, &certPass, &telefone, &dataemissao, &datavencimento)
 
 		if err != nil {
 			panic(err.Error())
@@ -85,6 +86,7 @@ func Inicio(w http.ResponseWriter, r *http.Request) {
 		certificado.Id = id
 		certificado.Cliente = cliente
 		certificado.Url = url
+		certificado.CertPass = certPass
 		certificado.Telefone = telefone
 		certificado.DataEmissao = dataemissao
 		certificado.DataVencimento = datavencimento
@@ -107,8 +109,8 @@ func Editar(w http.ResponseWriter, r *http.Request) {
 	certificado := Certificado{}
 	for registro.Next() {
 		var id int
-		var cliente, url, telefone, dataemissao, datavencimento string
-		err = registro.Scan(&id, &cliente, &url, &telefone, &dataemissao, &datavencimento)
+		var cliente, url, CertPass, telefone, dataemissao, datavencimento string
+		err = registro.Scan(&id, &cliente, &url, &CertPass, &telefone, &dataemissao, &datavencimento)
 
 		if err != nil {
 			panic(err.Error())
@@ -116,6 +118,7 @@ func Editar(w http.ResponseWriter, r *http.Request) {
 		certificado.Id = id
 		certificado.Cliente = cliente
 		certificado.Url = url
+		certificado.CertPass = CertPass
 		certificado.Telefone = telefone
 		certificado.DataEmissao = dataemissao
 		certificado.DataVencimento = datavencimento
@@ -157,17 +160,19 @@ func Inserir(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method == "POST" {
 		cliente := r.FormValue("cliente")
-		telefone := r.FormValue("telefone")
 		uploadArquivo := (handler.Filename)
-		dataVencimento := r.FormValue("datavencimento")
+		certPass := r.FormValue("certPass")
+		telefone := r.FormValue("telefone")
+		dataEmissao := r.FormValue("dataEmissao")
+		dataVencimento := r.FormValue("dataVencimento")
 
 		connEstabelecida := conexionBD()
-		inserirRegistros, err := connEstabelecida.Prepare("INSERT INTO certificado(cliente, telefone, url, data_vencimento) VALUES(?, ?, ?, ?)")
+		inserirRegistros, err := connEstabelecida.Prepare("INSERT INTO certificado(cliente, url, certPass, telefone, data_emissao, data_vencimento) VALUES(?, ?, ?, ?, ?, ?)")
 
 		if err != nil {
 			panic(err.Error())
 		}
-		inserirRegistros.Exec(cliente, telefone, uploadArquivo, dataVencimento)
+		inserirRegistros.Exec(cliente, uploadArquivo, certPass, telefone, dataEmissao, dataVencimento)
 		http.Redirect(w, r, "/", 301)
 	}
 
@@ -214,8 +219,8 @@ func Relatorio(w http.ResponseWriter, r *http.Request) {
 		arrayBusca := []Certificado{}
 		for buscaRegistros.Next() {
 			var id int
-			var cliente, url, telefone, dataemissao, datavencimento string
-			err = buscaRegistros.Scan(&id, &cliente, &url, &telefone, &dataemissao, &datavencimento)
+			var cliente, url, certPass, telefone, dataemissao, datavencimento string
+			err = buscaRegistros.Scan(&id, &cliente, &url, &certPass, &telefone, &dataemissao, &datavencimento)
 
 			if err != nil {
 				panic(err.Error())
@@ -223,6 +228,7 @@ func Relatorio(w http.ResponseWriter, r *http.Request) {
 			certificado.Id = id
 			certificado.Cliente = cliente
 			certificado.Url = url
+			certificado.CertPass = certPass
 			certificado.Telefone = telefone
 			certificado.DataEmissao = dataemissao
 			certificado.DataVencimento = datavencimento
@@ -250,8 +256,8 @@ func RelatorioCliente(w http.ResponseWriter, r *http.Request) {
 		arrayBusca := []Certificado{}
 		for buscaRegistros.Next() {
 			var id int
-			var cliente, url, telefone, dataemissao, datavencimento string
-			err = buscaRegistros.Scan(&id, &cliente, &url, &telefone, &dataemissao, &datavencimento)
+			var cliente, url, certPass, telefone, dataemissao, datavencimento string
+			err = buscaRegistros.Scan(&id, &cliente, &url, &certPass, &telefone, &dataemissao, &datavencimento)
 
 			if err != nil {
 				panic(err.Error())
@@ -259,6 +265,7 @@ func RelatorioCliente(w http.ResponseWriter, r *http.Request) {
 			certificado.Id = id
 			certificado.Cliente = cliente
 			certificado.Url = url
+			certificado.CertPass = certPass
 			certificado.Telefone = telefone
 			certificado.DataEmissao = dataemissao
 			certificado.DataVencimento = datavencimento

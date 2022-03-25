@@ -46,9 +46,8 @@
     <tr>
       <th scope="col">#</th>
       <th scope="col">Cliente</th>
-      <th scope="col">Telefone</th>
-      <th scope="col">Data Vencimento</th>
-      <th scope="col">Dias Restantes</th>
+      <th scope="col">Data Emissão</th>
+      <th scope="col">Dias Vencimento</th>
       <th scope="col">Ação</th>
     </tr>
   </thead>
@@ -57,17 +56,10 @@
     <tr>
       <th scope="row">{{.Id}}</th>
       <td>{{.Cliente}}</td>
-      <td>{{.Telefone}}</td>
+      <td>{{.DataEmissao}}</td>
       <td>{{.DataVencimento}}</td>
-      <td></td>
       <td>
-      <a class="btn btn-danger" href="/editar?id={{.Id}}" role="button">Editar</a>
-      |
-      <a class="btn btn-danger" href="/apagar?id={{.Id}}" role="button">Apagar</a>
-      |
-      <a class="btn btn-danger" href="{{.Url}}" target="_blank" role="button">Dowload</a>
-      |
-      <a class="btn btn-success" href="https://api.whatsapp.com/send?phone={{.Telefone}}&text=Ol%C3%A1%2C%20{{.Cliente}}%20seu%20certificado%20digital%20est%C3%A1%20prestes%20a%20expirar!" target="_blank" role="button">Whatsapp</a>
+      <a class="btn btn-dark" href="/editar?id={{.Id}}" role="button">Visualizar</a>
       </td>
     </tr>
     {{end}}

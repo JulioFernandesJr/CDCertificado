@@ -9,37 +9,56 @@
     <title>Agendador</title>
   </head>
   <body>
-  <div class="container-md">
-  <a name="" id="" class="btn btn-primary" href="/criar" role="button">Criar</a>
-  <a name="" id="" class="btn btn-primary" href="/buscar" role="button">Buscar</a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/inicio">Certificados Digitais</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/inicio">Inicio | </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/buscar">Buscar por Data | </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="/buscarCliente">Buscar por Cliente</a>
+              </li>
+            </ul>
+            <ul class="nav justify-content-end">
+              <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="/criar">+ Adicionar</a>
+              </li>
+            </ul>  
+          </div>
+        </div>
+      </nav>
+      <br>
+  <div class="container-lg">
+  <!-- <a name="" id="" class="btn btn-primary" href="/criar" role="button">Criar</a>
+  <a name="" id="" class="btn btn-primary" href="/buscar" role="button">Buscar</a> -->
     <table class="table">
   <thead>
     <tr>
-      <th scope="col">#</th>
-      <th scope="col">Cliente</th>
-      <th scope="col">Telefone</th>
-      <th scope="col">Data Vencimento</th>
-      <th scope="col">Dias Restantes</th>
-      <th scope="col">Ação</th>
+        <th scope="col">#</th>
+        <th scope="col">Cliente</th>
+        <th scope="col">Data Emissão</th>
+        <th scope="col">Dias Vencimento</th>
+        <th scope="col">Ação</th>
     </tr>
   </thead>
   <tbody>
   {{range.}}
     <tr>
-      <th scope="row">{{.Id}}</th>
-      <td>{{.Cliente}}</td>
-      <td>{{.Telefone}}</td>
-      <td>{{.DataVencimento}}</td>
-      <td></td>
-      <td>
-      <a class="btn btn-danger" href="/editar?id={{.Id}}" role="button">Editar</a>
-      |
-      <a class="btn btn-danger" href="/apagar?id={{.Id}}" role="button">Apagar</a>
-      |
-      <a class="btn btn-danger" href="{{.Url}}" target="_blank" role="button">Dowload</a>
-      |
-      <a class="btn btn-success" href="https://api.whatsapp.com/send?phone={{.Telefone}}&text=Ol%C3%A1%2C%20{{.Cliente}}%20seu%20certificado%20digital%20est%C3%A1%20prestes%20a%20expirar!" target="_blank" role="button">Whatsapp</a>
-      </td>
+        <th scope="row">{{.Id}}</th>
+        <td>{{.Cliente}}</td>
+        <td>{{.DataEmissao}}</td>
+        <td>{{.DataVencimento}}</td>
+        <td>
+        <a class="btn btn-dark" href="/editar?id={{.Id}}" role="button">Visualizar</a>
+        </td></td>
     </tr>
     {{end}}
   </tbody>
