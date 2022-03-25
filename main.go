@@ -30,7 +30,9 @@ var modelo = template.Must(template.ParseGlob("modelo/*"))
 func main() {
 	http.HandleFunc("/", Inicio)
 	http.HandleFunc("/buscar", Buscar)
+	http.HandleFunc("/buscarCliente", BuscarCliente)
 	http.HandleFunc("/relatorio", Relatorio)
+	http.HandleFunc("/relatorioCliente", RelatorioCliente)
 	http.HandleFunc("/criar", Criar)
 	http.HandleFunc("/inserir", Inserir)
 	http.HandleFunc("/apagar", Apagar)
@@ -193,6 +195,10 @@ func Buscar(w http.ResponseWriter, r *http.Request) {
 	modelo.ExecuteTemplate(w, "buscar", nil)
 }
 
+func BuscarCliente(w http.ResponseWriter, r *http.Request) {
+	modelo.ExecuteTemplate(w, "buscarCliente", nil)
+}
+
 func Relatorio(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		idBusca := r.FormValue("id")
@@ -225,6 +231,42 @@ func Relatorio(w http.ResponseWriter, r *http.Request) {
 		}
 
 		modelo.ExecuteTemplate(w, "relatorio", arrayBusca)
+	}
+
+}
+
+func RelatorioCliente(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		idBusca := r.FormValue("id")
+
+		connEstabelecida := conexionBD()
+		buscaRegistros, err := connEstabelecida.Query("SELECT * FROM certificado WHERE cliente=?", idBusca)
+
+		if err != nil {
+			panic(err.Error())
+		}
+
+		certificado := Certificado{}
+		arrayBusca := []Certificado{}
+		for buscaRegistros.Next() {
+			var id int
+			var cliente, url, telefone, dataemissao, datavencimento string
+			err = buscaRegistros.Scan(&id, &cliente, &url, &telefone, &dataemissao, &datavencimento)
+
+			if err != nil {
+				panic(err.Error())
+			}
+			certificado.Id = id
+			certificado.Cliente = cliente
+			certificado.Url = url
+			certificado.Telefone = telefone
+			certificado.DataEmissao = dataemissao
+			certificado.DataVencimento = datavencimento
+
+			arrayBusca = append(arrayBusca, certificado)
+		}
+
+		modelo.ExecuteTemplate(w, "relatorioCliente", arrayBusca)
 	}
 
 }
