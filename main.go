@@ -3,11 +3,15 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"io"
+
+	//"io/ioutil"
 	"log"
 	"net/http"
-	"os"
+
+	//"os"
 	"text/template"
+
+	"io/ioutil"
 
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -45,6 +49,7 @@ func main() {
 type Certificado struct {
 	Id             int
 	Cliente        string
+	Doc            string
 	Url            string
 	CertPass       string
 	Telefone       string
@@ -77,14 +82,15 @@ func Inicio(w http.ResponseWriter, r *http.Request) {
 
 	for registros.Next() {
 		var id int
-		var cliente, url, certPass, telefone, dataemissao, datavencimento string
-		err = registros.Scan(&id, &cliente, &url, &certPass, &telefone, &dataemissao, &datavencimento)
+		var cliente, doc, url, certPass, telefone, dataemissao, datavencimento string
+		err = registros.Scan(&id, &cliente, &doc, &url, &certPass, &telefone, &dataemissao, &datavencimento)
 
 		if err != nil {
 			panic(err.Error())
 		}
 		certificado.Id = id
 		certificado.Cliente = cliente
+		certificado.Doc = doc
 		certificado.Url = url
 		certificado.CertPass = certPass
 		certificado.Telefone = telefone
@@ -109,14 +115,15 @@ func Editar(w http.ResponseWriter, r *http.Request) {
 	certificado := Certificado{}
 	for registro.Next() {
 		var id int
-		var cliente, url, CertPass, telefone, dataemissao, datavencimento string
-		err = registro.Scan(&id, &cliente, &url, &CertPass, &telefone, &dataemissao, &datavencimento)
+		var cliente, doc, url, CertPass, telefone, dataemissao, datavencimento string
+		err = registro.Scan(&id, &cliente, &doc, &url, &CertPass, &telefone, &dataemissao, &datavencimento)
 
 		if err != nil {
 			panic(err.Error())
 		}
 		certificado.Id = id
 		certificado.Cliente = cliente
+		certificado.Doc = doc
 		certificado.Url = url
 		certificado.CertPass = CertPass
 		certificado.Telefone = telefone
@@ -146,33 +153,36 @@ func Inserir(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("File Size: %+v\n", handler.Size)
 	fmt.Printf("MIME Header: %+v\n", handler.Header)
 
-	dst, err := os.Create(handler.Filename)
-	defer dst.Close()
+	//aqui
+	tempFile, err := ioutil.TempFile("certificado", "upload-*.pfx")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		fmt.Println(err)
 	}
+	nome := tempFile.Name()
 
-	if _, err := io.Copy(dst, file); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	defer tempFile.Close()
+	fileBytes, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Println(err)
 	}
-
+	tempFile.Write(fileBytes)
+	//ate aqui
 	if r.Method == "POST" {
 		cliente := r.FormValue("cliente")
-		uploadArquivo := (handler.Filename)
+		doc := r.FormValue("doc")
+		uploadArquivo := nome
 		certPass := r.FormValue("certPass")
 		telefone := r.FormValue("telefone")
 		dataEmissao := r.FormValue("dataEmissao")
 		dataVencimento := r.FormValue("dataVencimento")
 
 		connEstabelecida := conexionBD()
-		inserirRegistros, err := connEstabelecida.Prepare("INSERT INTO certificado(cliente, url, certPass, telefone, data_emissao, data_vencimento) VALUES(?, ?, ?, ?, ?, ?)")
+		inserirRegistros, err := connEstabelecida.Prepare("INSERT INTO certificado(cliente, doc, url, certPass, telefone, data_emissao, data_vencimento) VALUES(?, ?, ?, ?, ?, ?, ?)")
 
 		if err != nil {
 			panic(err.Error())
 		}
-		inserirRegistros.Exec(cliente, uploadArquivo, certPass, telefone, dataEmissao, dataVencimento)
+		inserirRegistros.Exec(cliente, doc, uploadArquivo, certPass, telefone, dataEmissao, dataVencimento)
 		http.Redirect(w, r, "/", 301)
 	}
 
@@ -219,14 +229,15 @@ func Relatorio(w http.ResponseWriter, r *http.Request) {
 		arrayBusca := []Certificado{}
 		for buscaRegistros.Next() {
 			var id int
-			var cliente, url, certPass, telefone, dataemissao, datavencimento string
-			err = buscaRegistros.Scan(&id, &cliente, &url, &certPass, &telefone, &dataemissao, &datavencimento)
+			var cliente, doc, url, certPass, telefone, dataemissao, datavencimento string
+			err = buscaRegistros.Scan(&id, &cliente, &doc, &url, &certPass, &telefone, &dataemissao, &datavencimento)
 
 			if err != nil {
 				panic(err.Error())
 			}
 			certificado.Id = id
 			certificado.Cliente = cliente
+			certificado.Doc = doc
 			certificado.Url = url
 			certificado.CertPass = certPass
 			certificado.Telefone = telefone
@@ -246,7 +257,7 @@ func RelatorioCliente(w http.ResponseWriter, r *http.Request) {
 		idBusca := r.FormValue("id")
 
 		connEstabelecida := conexionBD()
-		buscaRegistros, err := connEstabelecida.Query("SELECT * FROM certificado WHERE cliente=?", idBusca)
+		buscaRegistros, err := connEstabelecida.Query("SELECT * FROM certificado WHERE doc=?", idBusca)
 
 		if err != nil {
 			panic(err.Error())
@@ -256,14 +267,15 @@ func RelatorioCliente(w http.ResponseWriter, r *http.Request) {
 		arrayBusca := []Certificado{}
 		for buscaRegistros.Next() {
 			var id int
-			var cliente, url, certPass, telefone, dataemissao, datavencimento string
-			err = buscaRegistros.Scan(&id, &cliente, &url, &certPass, &telefone, &dataemissao, &datavencimento)
+			var cliente, doc, url, certPass, telefone, dataemissao, datavencimento string
+			err = buscaRegistros.Scan(&id, &cliente, &doc, &url, &certPass, &telefone, &dataemissao, &datavencimento)
 
 			if err != nil {
 				panic(err.Error())
 			}
 			certificado.Id = id
 			certificado.Cliente = cliente
+			certificado.Doc = doc
 			certificado.Url = url
 			certificado.CertPass = certPass
 			certificado.Telefone = telefone
