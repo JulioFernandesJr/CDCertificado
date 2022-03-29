@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 
-	//"io/ioutil"
 	"log"
 	"net/http"
 
