@@ -43,7 +43,7 @@ func main() {
 	http.HandleFunc("/editar", Editar)
 	http.HandleFunc("/atualizar", Atualizar)
 	log.Println("Servidor Rodando")
-	http.ListenAndServe(":3000", nil)
+	http.ListenAndServe(":3010", nil)
 }
 
 type Certificado struct {
@@ -192,16 +192,21 @@ func Atualizar(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		id := r.FormValue("id")
 		cliente := r.FormValue("cliente")
+		doc := r.FormValue("doc")
+		//url := r.FormValue("url")
+		certPass := r.FormValue("certPass")
 		telefone := r.FormValue("telefone")
+		data_emissao := r.FormValue("dataEmissao")
+		data_vencimento := r.FormValue("dataVencimento")
 
 		connEstabelecida := conexionBD()
-		atualizarRegistros, err := connEstabelecida.Prepare("UPDATE certificado SET cliente=?,telefone=? WHERE id=?")
+		atualizarRegistros, err := connEstabelecida.Prepare("UPDATE certificado SET cliente=?, doc=?, certPass=?, telefone=?, data_emissao=?,  data_vencimento=? WHERE id=?")
 
 		if err != nil {
 			panic(err.Error())
 		}
 
-		atualizarRegistros.Exec(cliente, telefone, id)
+		atualizarRegistros.Exec(cliente, doc, certPass, telefone, data_emissao, data_vencimento, id)
 		http.Redirect(w, r, "/", 301)
 	}
 }
