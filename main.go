@@ -7,7 +7,9 @@ import (
 	"log"
 	"net/http"
 
-	//"os"
+	"github.com/joho/godotenv"
+
+	"os"
 	"text/template"
 
 	"io/ioutil"
@@ -17,11 +19,12 @@ import (
 
 func conexionBD() (conexion *sql.DB) {
 	Driver := "mysql"
-	DBUsuario := "root"
-	DBSenha := ""
-	DBBanco := "catalogo"
+	DBUsuario := os.Getenv("DB_USUARIO")
+	DBSenha := os.Getenv("DB_SENHA")
+	DBBanco := os.Getenv("DB_BANCO")
+	DBHost := os.Getenv("DB_HOST")
 
-	conn, err := sql.Open(Driver, DBUsuario+":"+DBSenha+"@tcp(127.0.0.1)/"+DBBanco)
+	conn, err := sql.Open(Driver, DBUsuario+":"+DBSenha+"@tcp("+DBHost+")/"+DBBanco)
 	if err != nil {
 		panic(err)
 	}
@@ -29,6 +32,13 @@ func conexionBD() (conexion *sql.DB) {
 }
 
 var modelo = template.Must(template.ParseGlob("modelo/*"))
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
 
 func main() {
 	http.HandleFunc("/", Inicio)
